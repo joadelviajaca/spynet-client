@@ -1,42 +1,10 @@
 // src/components/MissionList.tsx
-import { useEffect, useState } from "react";
+import { useMissions } from "../hooks/useMissions";
 
-// Definimos la interfaz aquí mismo (luego la moveremos)
-interface Mission {
-  _id: string;
-  title: string;
-  description: string;
-  status: string;
-  difficulty: "Baja" | "Media" | "Alta" | "Imposible";
-}
-
-// ⚠️ HARDCODE: Pide a los alumnos que peguen aquí un token válido de su Postman
-const TEMPORARY_TOKEN = "pegar_token_jwt_aqui"; 
 
 export const MissionList = () => {
-  const [missions, setMissions] = useState<Mission[]>([]);
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    fetch("http://localhost:3001/missions", {
-      headers: {
-        "Authorization": `Bearer ${TEMPORARY_TOKEN}`
-      }
-    })
-      .then((res) => {
-        if (!res.ok) throw new Error("Fallo de seguridad al obtener misiones");
-        return res.json();
-      })
-      .then((data) => {
-        setMissions(data);
-        setLoading(false);
-      })
-      .catch((err) => {
-        setError(err.message);
-        setLoading(false);
-      });
-  }, []);
+  // 🪄 MAGIA: En una línea tenemos todo
+  const { missions, loading, error } = useMissions();
 
   if (loading) return <div className="p-10 text-center text-spy-green animate-pulse">Cargando datos encriptados...</div>;
   if (error) return <div className="p-10 text-center text-red-500">🚨 ERROR: {error}</div>;
