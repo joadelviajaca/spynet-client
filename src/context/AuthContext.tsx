@@ -1,6 +1,8 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
-import type { User, LoginCredentials } from "../types";
+import type { User, LoginCredentials, JWTPayload } from "../types";
 import { loginUser } from "../services/auth.service";
+import { getMissions } from "../services/mission.service";
+import { jwtDecode } from "jwt-decode";
 
 // 1. Definimos qué datos tendrá nuestro contexto
 interface AuthContextType {
@@ -16,23 +18,58 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const [user, setUser] = useState<User | null>(null);
     const [token, setToken] = useState<string | null>(null);
-    
+    const [isInitialized, setIsInitialized] = useState(false);
+
     useEffect(() => {
-        const storedToken = localStorage.getItem("spy_token");
-        const storedUser = localStorage.getItem("spy_user");
-        if (storedToken && storedUser) {
-            setToken(storedToken);
-            setUser(JSON.parse(storedUser));
+        const initializeAuth = async () => {
+            const storedToken = localStorage.getItem("spy_token");
+
+            if (!storedToken) {
+                setIsInitialized(true);
+                return;
+            }
+
+            try {
+                const response = await getMissions(storedToken);
+
+                setToken(storedToken);
+                const payload = jwtDecode<JWTPayload>(storedToken);
+                setUser({
+                    id: payload.id,
+                    name: payload.name,
+                    role: payload.role
+                });
+
+
+            } catch (error) {
+                console.warn("Sesión caducada");
+                localStorage.removeItem("spy_token");
+                localStorage.removeItem("spy_user");
+                setUser(null);
+                setToken(null);
+
+            } finally {
+                setIsInitialized(true);
+            }
+
+
         }
+
+        initializeAuth();
     }, []);
-    
+
     const login = async (credentials: LoginCredentials) => {
         try {
             const data = await loginUser(credentials);
             // Guardamos en estado
             localStorage.setItem("spy_token", data.token);
-            localStorage.setItem("spy_user", JSON.stringify(data.user));
-            setUser(data.user);
+            const payload = jwtDecode<JWTPayload>(data.token);
+            setUser({
+                id: payload.id,
+                name: payload.name,
+                role: payload.role
+            });
+
             setToken(data.token);
             // OJO: La semana que viene veremos cómo persistir esto en LocalStorage
             // para que no se pierda al recargar.
@@ -47,7 +84,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         localStorage.removeItem("spy_token");
         localStorage.removeItem("spy_user");
     };
-    
     return (
         <AuthContext.Provider value={{
             user, token,

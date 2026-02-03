@@ -18,7 +18,15 @@ export interface AuthResponse {
 }
 
 export interface User {
-    email: string;
+    id: string;
     name: string;
     role: string;
+}
+
+export interface JWTPayload {
+  id: string;
+  name: string;
+  role: 'admin' | 'agent';
+  exp: number; // El token siempre trae fecha de expiración (unix timestamp)
+  iat: number; // Issued At
 }
