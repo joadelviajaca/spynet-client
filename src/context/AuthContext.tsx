@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import type { User, LoginCredentials } from "../types";
 import { loginUser } from "../services/auth.service";
 
@@ -16,10 +16,22 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const [user, setUser] = useState<User | null>(null);
     const [token, setToken] = useState<string | null>(null);
+    
+    useEffect(() => {
+        const storedToken = localStorage.getItem("spy_token");
+        const storedUser = localStorage.getItem("spy_user");
+        if (storedToken && storedUser) {
+            setToken(storedToken);
+            setUser(JSON.parse(storedUser));
+        }
+    }, []);
+    
     const login = async (credentials: LoginCredentials) => {
         try {
             const data = await loginUser(credentials);
             // Guardamos en estado
+            localStorage.setItem("spy_token", data.token);
+            localStorage.setItem("spy_user", JSON.stringify(data.user));
             setUser(data.user);
             setToken(data.token);
             // OJO: La semana que viene veremos cómo persistir esto en LocalStorage
@@ -32,7 +44,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const logout = () => {
         setUser(null);
         setToken(null);
+        localStorage.removeItem("spy_token");
+        localStorage.removeItem("spy_user");
     };
+    
     return (
         <AuthContext.Provider value={{
             user, token,

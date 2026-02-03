@@ -4,6 +4,7 @@ import { MainLayout } from "./layouts/MainLayout";
 import { MissionList } from "./components/MissionList"; // Tu componente de ayer
 import { useAuth } from "./context/AuthContext";
 import { LoginTemp } from "./components/LoginTemp";
+import { LoginPage } from "./pages/LoginPage";
 
 function App() {
   const { isAuthenticated } = useAuth();
@@ -12,7 +13,7 @@ function App() {
       <Routes>
         {/* Rutas Públicas */}
         <Route path="/login" element={
-          isAuthenticated ? <Navigate to="/dashboard" /> : <LoginTemp />
+          isAuthenticated ? <Navigate to="/dashboard" /> : <LoginPage />
         } />
         {/* Rutas Privadas (Protegidas por MainLayout) */}
         {/* Nota: La protección real con <RequireAuth> la veremos la semana que viene.
