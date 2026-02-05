@@ -5,6 +5,7 @@ import { MissionList } from "./components/MissionList"; // Tu componente de ayer
 import { useAuth } from "./context/AuthContext";
 import { LoginTemp } from "./components/LoginTemp";
 import { LoginPage } from "./pages/LoginPage";
+import { RequireAuth } from "./components/RequireAuth";
 
 function App() {
   const { isAuthenticated } = useAuth();
@@ -12,20 +13,26 @@ function App() {
     <BrowserRouter>
       <Routes>
         {/* Rutas Públicas */}
-        <Route path="/login" element={
-          isAuthenticated ? <Navigate to="/dashboard" /> : <LoginPage />
-        } />
-        {/* Rutas Privadas (Protegidas por MainLayout) */}
-        {/* Nota: La protección real con <RequireAuth> la veremos la semana que viene.
-Por ahora, si no hay usuario, el MainLayout mostrará "Agente: undefined" */}
-        <Route path="/" element={<MainLayout />}>
-          {/* Redirigir la raíz al dashboard */}
-          <Route index element={<Navigate to="/dashboard" />} />
-          <Route path="dashboard" element={
-            // Condicional simple para hoy (Mejora la semana que viene)
-            isAuthenticated ? <MissionList /> : <Navigate to="/login" />
-          } />
+
+        {/* 🔐 ZONA PRIVADA (SpyNet) 
+            Envolvemos el Layout Privado con RequireAuth.
+            Si no estás logueado, ni siquiera se renderiza el MainLayout.
+        */}
+        <Route path="/dashboard" element={
+          <RequireAuth>
+            <MainLayout />
+          </RequireAuth>
+        }>
+           <Route index element={<MissionList />} />
+           {/* Aquí irían más rutas: /dashboard/profile, /dashboard/settings, etc. */}
         </Route>
+
+        {/* 👤 LOGIN */}
+        <Route path="/login" element={<LoginPage />} />
+
+        {/* 404 - Cualquier otra ruta redirige a la home */}
+        <Route path="*" element={<Navigate to="/" replace />} />
+
       </Routes>
     </BrowserRouter>
   );

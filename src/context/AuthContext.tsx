@@ -9,6 +9,7 @@ interface AuthContextType {
     user: User | null;
     token: string | null;
     isAuthenticated: boolean;
+    isInitialized: boolean;
     login: (creds: LoginCredentials) => Promise<void>;
     logout: () => void;
 }
@@ -23,6 +24,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     useEffect(() => {
         const initializeAuth = async () => {
             const storedToken = localStorage.getItem("spy_token");
+            // Retraso introducido para ver cómo muestra la validación de la autenticación.
+            await new Promise(resolve => setTimeout(resolve, 2000)) 
 
             if (!storedToken) {
                 setIsInitialized(true);
@@ -88,6 +91,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         <AuthContext.Provider value={{
             user, token,
             isAuthenticated: !!user, // true si hay usuario
+            isInitialized,
             login, logout
         }}>
             {children} </AuthContext.Provider>
