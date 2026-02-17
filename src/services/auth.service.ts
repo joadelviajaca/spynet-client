@@ -1,5 +1,5 @@
 // src/services/auth.service.ts
-import type { LoginCredentials, AuthResponse } from "../types"; // Definid estos tipos en /types
+import type { LoginCredentials, AuthResponse, User } from "../types"; // Definid estos tipos en /types
 
 const API_URL = "http://localhost:3001/auth";
 
@@ -14,3 +14,16 @@ export const loginUser = async (credentials: LoginCredentials): Promise<AuthResp
     }
     return response.json(); // Devuelve { token, user }
 };
+
+
+export const register = async (user: Omit<User,'id'> ): Promise<User> => {
+    const response = await fetch(`{API_URL}/register`, {
+        method: 'POST',
+        headers: { "Content-Type": "application/json"},
+        body: JSON.stringify(user)
+    });
+    if (!response.ok) {
+        throw new Error("Error registrando usuario");
+    }
+    return response.json();
+}

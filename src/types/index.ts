@@ -30,3 +30,4 @@ export interface JWTPayload {
   exp: number; // El token siempre trae fecha de expiración (unix timestamp)
   iat: number; // Issued At
 }
+
