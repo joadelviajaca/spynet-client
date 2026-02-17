@@ -17,7 +17,7 @@ export const loginUser = async (credentials: LoginCredentials): Promise<AuthResp
 
 
 export const register = async (user: Omit<User,'id'> ): Promise<User> => {
-    const response = await fetch(`{API_URL}/register`, {
+    const response = await fetch(`${API_URL}/register`, {
         method: 'POST',
         headers: { "Content-Type": "application/json"},
         body: JSON.stringify(user)

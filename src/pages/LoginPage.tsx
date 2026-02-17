@@ -27,8 +27,9 @@ export const LoginPage = () => {
         {error && <div className="bg-red-900/50 text-red-200 p-2 text-sm rounded mb-4 text-center">{error}</div>}
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-gray-400 text-sm mb-1">Email Operativo</label>
+            <label className="block text-gray-400 text-sm mb-1" htmlFor="email">Email Operativo</label>
             <input 
+              id="email"
               type="email" 
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -37,8 +38,9 @@ export const LoginPage = () => {
             />
           </div>
           <div>
-            <label className="block text-gray-400 text-sm mb-1">Código de Acceso</label>
+            <label className="block text-gray-400 text-sm mb-1" htmlFor="password">Código de Acceso</label>
             <input 
+              id="password"
               type="password" 
               value={password}
               onChange={(e) => setPassword(e.target.value)}
